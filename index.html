@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HomeMarket — Everything under $500</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class', theme: { extend: {} } }
+  </script>
+  <style>
+    :root { --toast-bg: #22c55e; }
+    html { scroll-behavior:smooth; }
+    .glass{backdrop-filter:blur(8px)}
+    .fade-in{animation:fade .45s ease-out both}
+    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .shadow-smooth{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    @keyframes bump{0%{transform:translateY(0)}30%{transform:translateY(-12px)}60%{transform:translateY(0)}80%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+    .bounce{animation:bump .5s ease-out}
+    @keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+    .pulse{animation:pulse .35s ease-out}
+    .toast{position:fixed;top:20px;right:20px;z-index:90;display:none}
+    .toast.show{display:flex}
+    .spark{position:absolute;border:2px solid #22c55e;border-radius:9999px;opacity:.9;transform:translate(-50%,-50%);pointer-events:none}
+    @keyframes sparkAnim{0%{width:0;height:0;opacity:.9}100%{width:64px;height:64px;opacity:0}}
+    .hero-wrap{position:absolute;inset:0;overflow:hidden}
+    .hero-img{position:absolute;inset:0;width:110%;height:100%;object-fit:cover;opacity:0;transform:translateX(0);will-change:transform,opacity}
+    .hero-img.active{opacity:1}
+    .hero-dim{position:absolute;inset:0;background:rgba(0,0,0,.40)}
+    .reveal{opacity:0;transform:translateY(12px);transition:opacity .5s ease, transform .5s ease}
+    .reveal.show{opacity:1;transform:none}
+    .active-filter{background-color:white!important;color:black!important;border-color:white!important;}
+    /* Modal */
+    .modal-backdrop{background:rgba(0,0,0,.5)}
+    .modal{transform:translateY(10px);opacity:0;transition:.25s ease}
+    .modal.show{transform:none;opacity:1}
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-100 text-zinc-900 dark:from-zinc-900 dark:via-zinc-950 dark:to-black dark:text-zinc-100">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 glass bg-white/70 border-b dark:bg-black/40 dark:border-zinc-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l2 6l-5 4l6 0l2 6l2-6l6 0l-5-4l2-6l-5 4l-5-4z"/></svg>
+        <span class="font-semibold tracking-tight text-lg">HomeMarket</span>
+        <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-300/20 dark:text-emerald-300 dark:border-emerald-400/30">under $500</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" class="rounded-xl border px-2.5 py-2 bg-white hover:shadow-smooth dark:bg-black/60 dark:border-zinc-800" title="Toggle theme">
+          <span id="themeIcon" class="block">🌙</span>
+        </button>
+        <button id="openCart" class="relative inline-flex items-center gap-2 rounded-2xl border px-3 py-2 hover:shadow-smooth bg-white dark:bg-black/60 dark:border-zinc-800">
+          <svg id="cartIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+          <span class="hidden sm:inline">Cart</span>
+          <span id="cartQtyBadge" class="ml-1 text-xs font-medium rounded-full bg-black text-white px-2 py-0.5 dark:bg-white dark:text-black">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden text-white">
+    <div class="hero-wrap" aria-hidden="true">
+      <img id="heroA" class="hero-img active" src="https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=2000&auto=format&fit=crop" alt="interior 1"/>
+      <img id="heroB" class="hero-img" src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=2000&auto=format&fit=crop" alt="interior 2"/>
+      <div class="hero-dim"></div>
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 fade-in text-center">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">Everything for your home at a fair price</h1>
+      <p class="mt-4 text-lg max-w-2xl mx-auto">An online store with carefully selected items under $500. Quality, fast delivery, and excellent service.</p>
+      <p class="mt-2 text-emerald-300 text-sm">Free worldwide shipping on orders over $300</p>
+      <div class="mt-6 flex justify-center gap-3 text-sm text-white/90">
+        <div class="flex items-center gap-1"><span>🔒</span> Secure Payment</div>
+        <div class="flex items-center gap-1"><span>🚚</span> Fast Delivery</div>
+        <div class="flex items-center gap-1"><span>💬</span> 24/7 Support</div>
+      </div>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <button id="btnPopular" class="px-4 py-2 rounded-full border bg-white/10 backdrop-blur hover:bg-white/20 transition dark:border-white/20">Popular</button>
+        <button id="btnNew" class="px-4 py-2 rounded-full border bg-white/10 backdrop-blur hover:bg-white/20 transition dark:border-white/20">New arrivals</button>
+        <button id="btnReset" class="px-4 py-2 rounded-full border bg-white/10 backdrop-blur hover:bg-white/20 transition dark:border-white/20 active-filter">All</button>
+      </div>
+      <button id="scrollShop" class="mt-6 px-6 py-3 bg-white text-black rounded-full font-semibold hover:bg-gray-200 transition">Shop Now</button>
+      <div id="catChips" class="mt-6 flex flex-wrap items-center justify-center gap-2"></div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <section class="border-y glass bg-white/70 dark:bg-black/40 dark:border-zinc-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid md:grid-cols-4 gap-3 items-center">
+      <label class="col-span-2 flex items-center gap-2 border rounded-2xl px-3 py-2 bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchInput" placeholder="Search products..." class="w-full bg-transparent outline-none" />
+      </label>
+      <div class="flex flex-col">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-zinc-600 dark:text-zinc-400">Max price</span>
+          <span id="maxPriceLabel" class="text-sm font-medium">$500.00</span>
+        </div>
+        <input id="priceRange" type="range" min="10" max="500" step="1" value="500" class="w-full accent-black dark:accent-white" />
+      </div>
+      <label class="flex items-center gap-2 border rounded-2xl px-3 py-2 bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg>
+        <select id="sortSelect" class="w-full bg-transparent outline-none">
+          <option value="pop">By popularity</option>
+          <option value="priceAsc">Price: low to high</option>
+          <option value="priceDesc">Price: high to low</option>
+          <option value="rating">Rating</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <!-- Product grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center text-zinc-600 dark:text-zinc-400">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-spin mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      No products found for selected filters.
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t glass bg-white/70 dark:bg-black/40 dark:border-zinc-800 mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid md:grid-cols-4 gap-6 text-sm text-zinc-600 dark:text-zinc-400">
+      <div>
+        <div class="font-semibold text-zinc-900 dark:text-zinc-100">HomeMarket</div>
+        <p class="mt-2">Online store for home goods under $500. Returns within 14 days, 24/7 support.</p>
+        <p class="mt-4 text-xs text-zinc-500">© 2025 HomeMarket. All rights reserved.</p>
+      </div>
+      <div>
+        <div class="font-semibold text-zinc-900 dark:text-zinc-100">Shipping</div>
+        <p class="mt-2">We work with all international couriers: DHL, FedEx, UPS, USPS, Nova Poshta Global, Meest Express.</p>
+      </div>
+      <div>
+        <div class="font-semibold text-zinc-900 dark:text-zinc-100">Payment Methods</div>
+        <p class="mt-2 flex items-center gap-2">💳 Visa / MasterCard / PayPal</p>
+      </div>
+      <div>
+        <div class="font-semibold text-zinc-900 dark:text-zinc-100">Stay Updated</div>
+        <p class="mt-2">Subscribe to our newsletter for the latest offers.</p>
+        <div class="mt-3 flex gap-2">
+          <input type="email" placeholder="Enter your email" class="px-3 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700 w-full" />
+          <button class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition">Subscribe</button>
+        </div>
+        <div class="mt-4 flex gap-3 text-lg">
+          <a href="#" class="hover:text-emerald-400" title="Website">🌐</a>
+          <a href="#" class="hover:text-emerald-400" title="Instagram">📸</a>
+          <a href="#" class="hover:text-emerald-400" title="TikTok">🎵</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Drawer -->
+  <aside id="drawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white border-l shadow-2xl z-50 flex flex-col translate-x-full transition-transform dark:bg-zinc-900 dark:border-zinc-800">
+    <div class="p-4 border-b flex items-center justify-between dark:border-zinc-800">
+      <div class="flex items-center gap-2 font-semibold">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+        Your cart
+      </div>
+      <button id="closeCart" class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-auto p-4 space-y-3"></div>
+    <div class="p-4 border-t space-y-3 dark:border-zinc-800">
+      <div class="text-sm">Free shipping at <span class="font-medium">$300</span>. <span id="freeShipMsg"></span></div>
+      <div class="w-full h-2 bg-zinc-200 rounded-full overflow-hidden dark:bg-zinc-800">
+        <div id="freeShipBar" class="h-full bg-emerald-500" style="width:0%"></div>
+      </div>
+      <div class="flex gap-2">
+        <input id="promoInput" class="flex-1 px-3 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700" placeholder="Promo code (demo)"/>
+        <button id="applyPromo" class="px-3 py-2 rounded-lg border bg-white hover:bg-zinc-50 dark:bg-zinc-800 dark:border-zinc-700">Apply</button>
+      </div>
+      <div class="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400">
+        <span>Items</span>
+        <span id="cartQty" class="font-medium text-zinc-900 dark:text-zinc-100">0 pcs</span>
+      </div>
+      <div class="flex items-center justify-between text-base">
+        <span class="font-semibold">Total</span>
+        <span id="cartTotal" class="font-bold">$0.00</span>
+      </div>
+      <div class="flex gap-2">
+        <button id="continueBtn" class="w-1/2 py-3 rounded-2xl border dark:border-zinc-700">Continue shopping</button>
+        <button id="checkoutBtn" class="w-1/2 py-3 rounded-2xl bg-black text-white font-semibold hover:bg-zinc-900 active:scale-[0.99] disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200" disabled>Checkout</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CHECKOUT MODAL (opens on Buy) -->
+  <div id="checkoutBackdrop" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+    <div id="checkoutModal" class="modal max-w-lg w-full rounded-2xl bg-white dark:bg-zinc-900 border dark:border-zinc-800 shadow-2xl">
+      <div class="p-4 border-b dark:border-zinc-800 flex items-center justify-between">
+        <div class="font-semibold">Checkout</div>
+        <button id="closeCheckout" class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-4 space-y-4">
+        <div class="flex gap-3 items-center">
+          <img id="coImg" class="h-16 w-16 object-cover rounded-xl border dark:border-zinc-700" alt="product"/>
+          <div class="flex-1 min-w-0">
+            <div id="coTitle" class="font-medium line-clamp-1"></div>
+            <div class="text-sm text-zinc-500">ID: <span id="coId"></span></div>
+          </div>
+          <div class="text-right">
+            <div id="coPrice" class="font-semibold"></div>
+            <div class="mt-2 inline-flex items-center gap-2">
+              <button id="coDec" class="px-2 py-1 rounded-lg border dark:border-zinc-700">−</button>
+              <span id="coQty" class="w-6 inline-block text-center">1</span>
+              <button id="coInc" class="px-2 py-1 rounded-lg border dark:border-zinc-700">＋</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <input id="coName" class="px-3 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700" placeholder="Name"/>
+          <input id="coEmail" class="px-3 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700" placeholder="Email"/>
+          <input id="coAddress" class="sm:col-span-2 px-3 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700" placeholder="Address"/>
+          <select id="coPay" class="px-3 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700">
+            <option>Visa</option>
+            <option>MasterCard</option>
+            <option>PayPal</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="text-zinc-600 dark:text-zinc-400">Total</div>
+          <div id="coTotal" class="text-xl font-bold">$0.00</div>
+        </div>
+        <button id="coConfirm" class="w-full py-3 rounded-2xl bg-black text-white font-semibold hover:bg-zinc-900 active:scale-[0.99] dark:bg-white dark:text-black dark:hover:bg-zinc-200">Confirm Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <div class="flex items-center gap-2" style="background:var(--toast-bg);color:white;padding:.5rem 1rem;border-radius:1rem;box-shadow:0 10px 30px rgba(0,0,0,.1)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+      <span id="toastText">Added to cart!</span>
+    </div>
+  </div>
+
+  <!-- Background accents (dark mode only) -->
+  <div class="pointer-events-none fixed inset-0 -z-10 hidden dark:block">
+    <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-emerald-400/10 blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-indigo-400/10 blur-3xl"></div>
+  </div>
+
+<script>
+// ======= Theme (persist) =======
+(function initTheme(){
+  const saved = localStorage.getItem('theme');
+  const root = document.documentElement;
+  if(saved === 'light'){ root.classList.remove('dark'); } else { root.classList.add('dark'); }
+  const icon = document.getElementById('themeIcon');
+  if(icon) icon.textContent = root.classList.contains('dark') ? '🌙' : '☀️';
+})();
+function toggleTheme(){
+  const root = document.documentElement;
+  root.classList.toggle('dark');
+  localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+  document.getElementById('themeIcon').textContent = root.classList.contains('dark') ? '🌙' : '☀️';
+}
+
+// ======= Data =======
+const HERO_IMAGES = [
+  'https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=2000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=2000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1505692794403-34f50b9c8d59?q=80&w=2000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=2000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1505691723518-36a5ac3b2d52?q=80&w=2000&auto=format&fit=crop'
+];
+const CATEGORIES = ["Kitchen","Living Room","Bedroom","Office","Gadgets","Cleaning"];
+const PRODUCTS = [
+  { id: "p1", title: "HomeClean X2 Robot Vacuum", price: 299, rating: 4.6, category: "Cleaning", img: "https://images.unsplash.com/photo-1584714268709-c3dd9c92b37a?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p2", title: "Barista Mini Espresso Machine", price: 189, rating: 4.4, category: "Kitchen", img: "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p3", title: "SwiftAir Cordless Vacuum", price: 219, rating: 4.2, category: "Cleaning", img: "https://images.unsplash.com/photo-1593104547489-5cfb2c85a4cf?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p4", title: "Dimmable LED Lamp", price: 39, rating: 4.7, category: "Living Room", img: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p5", title: "ChefPro Knife Set (6 pcs)", price: 89, rating: 4.5, category: "Kitchen", img: "https://images.unsplash.com/photo-1510626176961-4b57d4fbad03?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p6", title: "Misty+ Air Humidifier", price: 79, rating: 4.1, category: "Bedroom", img: "https://images.unsplash.com/photo-1600664554482-c0aeed4a6602?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p7", title: "CozyCloud Fleece Blanket", price: 35, rating: 4.8, category: "Bedroom", img: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p8", title: "RGB Smart Bulb", price: 19, rating: 4.3, category: "Gadgets", img: "https://images.unsplash.com/photo-1544273677-c43313602197?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p9", title: "SteelBoil Electric Kettle", price: 49, rating: 4.4, category: "Kitchen", img: "https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p10", title: "ErgoWork Chair", price: 159, rating: 4.0, category: "Office", img: "https://images.unsplash.com/photo-1516387938699-a93567ec168e?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p11", title: "Minimal Wall Clock", price: 29, rating: 4.2, category: "Living Room", img: "https://images.unsplash.com/photo-1521175776577-f8f63d72c3b8?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p12", title: "Focus Desk Lamp", price: 59, rating: 4.6, category: "Office", img: "https://images.unsplash.com/photo-1457131760772-7017c6180f05?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p13", title: "PowerMix 1000W Blender", price: 119, rating: 4.4, category: "Kitchen", img: "https://images.unsplash.com/photo-1556912998-6a321d040ffe?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p14", title: "Oak Wall Shelf 80cm", price: 45, rating: 4.1, category: "Living Room", img: "https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p15", title: "20,000 mAh Power Bank", price: 59, rating: 4.6, category: "Gadgets", img: "https://images.unsplash.com/photo-1589310243389-96a5483213a3?q=80&w=1200&auto=format&fit=crop" },
+  { id: "p16", title: "BodyTrack Smart Scale", price: 49, rating: 4.3, category: "Gadgets", img: "https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=1200&auto=format&fit=crop" },
+];
+
+// ======= State =======
+const LS_KEY = 'mini_shop_cart_v1_html';
+let cart = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+let selectedCats = new Set();
+let search = '';
+let maxPrice = 500;
+let sort = 'pop';
+let filterMode = 'all'; // 'all' | 'popular' | 'new'
+let newPool = [];
+
+// ======= Helpers =======
+const usd = n => `$${n.toFixed(2)}`;
+const saveCart = () => localStorage.setItem(LS_KEY, JSON.stringify(cart));
+
+// Hero slider
+function rotateHero(){
+  let idx = 0; const a = document.getElementById('heroA'); const b = document.getElementById('heroB');
+  a.src = HERO_IMAGES[0]; b.src = HERO_IMAGES[1 % HERO_IMAGES.length]; let useAasActive = true;
+  setInterval(()=>{ const next = (idx + 1) % HERO_IMAGES.length; const incoming = useAasActive ? b : a; const outgoing = useAasActive ? a : b;
+    incoming.src = HERO_IMAGES[next]; incoming.style.transition='none'; incoming.style.transform='translateX(10%)'; incoming.style.opacity='0'; void incoming.offsetWidth;
+    const D=1200; incoming.style.transition=`transform ${D}ms ease, opacity ${D}ms ease`; outgoing.style.transition=`transform ${D}ms ease, opacity ${D}ms ease`;
+    incoming.classList.add('active'); outgoing.classList.add('active'); requestAnimationFrame(()=>{ incoming.style.transform='translateX(0)'; incoming.style.opacity='1'; outgoing.style.transform='translateX(-10%)'; outgoing.style.opacity='0'; });
+    setTimeout(()=>{ outgoing.classList.remove('active'); outgoing.style.transform='translateX(0)'; useAasActive=!useAasActive; idx=next; }, D);
+  }, 7000);
+}
+
+function showToast(text="Added to cart!"){ const t=document.getElementById('toast'); document.getElementById('toastText').textContent=text; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 1400); }
+function pulseBadge(){ const b=document.getElementById('cartQtyBadge'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+function bounceCard(id){ const card=document.querySelector(`[data-card="${id}"]`); if(!card) return; const img=card.querySelector('img'); (img||card).classList.remove('bounce'); void (img||card).offsetWidth; (img||card).classList.add('bounce'); }
+function sparkleAtCart(){ const cartIcon=document.getElementById('cartIcon'); const r=cartIcon.getBoundingClientRect(); const ring=document.createElement('div'); ring.className='spark'; ring.style.left=(r.x+r.width/2)+'px'; ring.style.top=(r.y+r.height/2)+'px'; ring.style.animation='sparkAnim .6s ease-out forwards'; ring.style.zIndex='80'; document.body.appendChild(ring); setTimeout(()=> ring.remove(), 620); }
+function flyToCart(imgEl){ const cartIcon=document.getElementById('cartIcon'); if(!imgEl||!cartIcon) return; const s=imgEl.getBoundingClientRect(); const c=cartIcon.getBoundingClientRect(); const start={x:s.x+s.width/2,y:s.y+s.height/2}; const end={x:c.x+c.width/2,y:c.y+c.height/2}; const ctrl={x:(start.x+end.x)/2,y:Math.min(start.y,end.y)-160}; const clone=imgEl.cloneNode(true); Object.assign(clone.style,{position:'fixed',left:'0px',top:'0px',width:'80px',height:'80px',objectFit:'cover',borderRadius:'12px',zIndex:'70',pointerEvents:'none'}); document.body.appendChild(clone); const duration=700; const t0=performance.now(); (function step(now){ const t=Math.min(1,(now-t0)/duration); const u=1-t; const x=u*u*start.x+2*u*t*ctrl.x+t*t*end.x; const y=u*u*start.y+2*u*t*ctrl.y+t*t*end.y; const scale=1-0.7*t; const rot=360*t; clone.style.transform=`translate(${x-40}px, ${y-40}px) scale(${scale}) rotate(${rot}deg)`; clone.style.opacity=String(1-0.2*t); if(t<1) requestAnimationFrame(step); else { clone.remove(); sparkleAtCart(); } })(t0); }
+
+function renderChips(){ const wrap=document.getElementById('catChips'); wrap.innerHTML=''; CATEGORIES.forEach(cat=>{ const btn=document.createElement('button'); btn.className=`px-3 py-1.5 rounded-full text-sm border transition shadow-sm hover:shadow ${selectedCats.has(cat)?'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white':'bg-white/30 glass border-white/40 text-white hover:bg-white/40'}`; btn.textContent=cat; btn.onclick=()=>{ selectedCats.has(cat)?selectedCats.delete(cat):selectedCats.add(cat); renderAll(); }; wrap.appendChild(btn); }); }
+
+function getFiltered(){ let list=PRODUCTS.filter(p=>p.price<=maxPrice); if(filterMode==='popular') list=list.filter(p=>p.rating>=4.5); if(filterMode==='new'){ if(newPool.length===0){ const shuffled=[...PRODUCTS].sort(()=>Math.random()-0.5); newPool=shuffled.slice(0,8).map(p=>p.id);} list=list.filter(p=>newPool.includes(p.id)); } if(selectedCats.size) list=list.filter(p=>selectedCats.has(p.category)); if(search.trim()) list=list.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())); if(sort==='priceAsc') list.sort((a,b)=>a.price-b.price); if(sort==='priceDesc') list.sort((a,b)=>b.price-a.price); if(sort==='rating') list.sort((a,b)=>b.rating-a.rating); return list; }
+
+let revealObserver; function setupReveal(){ if(revealObserver) revealObserver.disconnect(); revealObserver=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); revealObserver.unobserve(e.target); } }); }, { threshold:0.1 }); }
+
+function renderGrid(){ const grid=document.getElementById('grid'); const empty=document.getElementById('emptyState'); const list=getFiltered(); grid.innerHTML=''; if(list.length===0){ empty.classList.remove('hidden'); return; } else empty.classList.add('hidden'); list.forEach((p,i)=>{ const a=document.createElement('a'); a.href=`product.html?id=${p.id}`; a.className='reveal group rounded-3xl border bg-white shadow hover:shadow-lg transition overflow-hidden dark:bg-zinc-900 dark:border-zinc-800'; a.style.transitionDelay=(i*30)+'ms'; a.setAttribute('data-card', p.id); a.innerHTML=`
+      <div class="relative">
+        <img src="${p.img}" alt="${p.title}" class="h-48 w-full object-cover">
+        <div class="absolute top-3 left-3 bg-white/90 glass px-2 py-1 rounded-full text-xs border dark:bg-black/60 dark:text-white dark:border-zinc-700">${p.category}</div>
+      </div>
+      <div class="p-4 flex flex-col gap-2">
+        <h3 class="font-semibold leading-tight line-clamp-2 group-hover:underline">${p.title}</h3>
+        <div class="flex items-center gap-1">${stars(p.rating)}<span class="text-xs text-zinc-500 ml-1">${p.rating.toFixed(1)}</span></div>
+        <div class="flex items-center justify-between">
+          <div class="text-xl font-bold">${usd(p.price)}</div>
+          <div class="flex gap-2">
+            <button data-add="${p.id}" class="px-3 py-2 rounded-xl border bg-white hover:bg-zinc-50 active:scale-95 transition flex items-center gap-2 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-700"><span class="inline-block">＋</span> Add</button>
+            <button data-buy="${p.id}" class="px-3 py-2 rounded-xl bg-black text-white hover:bg-zinc-900 active:scale-95 transition dark:bg-white dark:text-black dark:hover:bg-zinc-200">Buy</button>
+          </div>
+        </div>
+      </div>`; grid.appendChild(a); revealObserver.observe(a); });
+  // Add
+  grid.querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click', e=>{ e.preventDefault(); const id=e.currentTarget.getAttribute('data-add'); const imgEl=e.currentTarget.closest('[data-card]')?.querySelector('img'); cart[id]=(cart[id]||0)+1; saveCart(); updateCartBadge(); bounceCard(id); pulseBadge(); showToast('Added to cart!'); if(imgEl) flyToCart(imgEl); }));
+  // Buy → open checkout modal
+  grid.querySelectorAll('[data-buy]').forEach(btn=>btn.addEventListener('click', e=>{ e.preventDefault(); const id=e.currentTarget.getAttribute('data-buy'); const p=PRODUCTS.find(x=>x.id===id); if(!p) return; openCheckout(p); })); }
+
+function stars(v){ const f=Math.round(v); let s=''; for(let i=0;i<5;i++) s+=`<svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 ${i<f?'fill-yellow-400 stroke-yellow-400':'stroke-zinc-400'}' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/></svg>`; return s; }
+
+function updateCartBadge(){ const qty=Object.values(cart).reduce((a,b)=>a+b,0); document.getElementById('cartQtyBadge').textContent=qty; }
+
+function renderCart(){ const wrap=document.getElementById('cartItems'); wrap.innerHTML=''; const entries=Object.entries(cart); if(entries.length===0){ wrap.innerHTML=`<div class=\"text-zinc-500 text-sm\">Your cart is empty.</div>`; }
+  let totalQty=0,total=0; entries.forEach(([id,qty])=>{ const p=PRODUCTS.find(x=>x.id===id); if(!p) return; totalQty+=qty; total+=p.price*qty; const row=document.createElement('div'); row.className='flex gap-3 border rounded-2xl p-3 items-center dark:border-zinc-800'; row.innerHTML=`
+      <img src='${p.img}' alt='${p.title}' class='h-16 w-16 object-cover rounded-xl'>
+      <div class='flex-1 min-w-0'>
+        <div class='font-medium line-clamp-1'>${p.title}</div>
+        <div class='text-sm text-zinc-600 dark:text-zinc-400'>${usd(p.price)}</div>
+        <div class='mt-2 flex items-center gap-2'>
+          <button data-dec='${id}' class='p-1.5 rounded-lg border dark:border-zinc-700'>−</button>
+          <span class='text-sm w-6 text-center'>${qty}</span>
+          <button data-inc='${id}' class='p-1.5 rounded-lg border dark:border-zinc-700'>＋</button>
+        </div>
+      </div>
+      <div class='flex flex-col items-end gap-2'>
+        <div class='font-semibold'>${usd(p.price*qty)}</div>
+        <button data-rem='${id}' class='text-xs text-red-600 hover:underline inline-flex items-center gap-1'>
+          <svg xmlns='http://www.w3.org/2000/svg' class='h-3 w-3' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M3 6h18M8 6v14m8-14v14M10 6h4M9 6V4h6v2'/></svg>
+          Remove
+        </button>
+      </div>`; wrap.appendChild(row); });
+  document.getElementById('cartQty').textContent=`${totalQty} pcs`; document.getElementById('cartTotal').textContent=usd(total); document.getElementById('checkoutBtn').disabled=totalQty===0; const threshold=300; const progress=Math.max(0,Math.min(1,total/threshold)); document.getElementById('freeShipBar').style.width=(progress*100)+'%'; document.getElementById('freeShipMsg').textContent= total>=threshold? 'You have free shipping! 🎉' : `$${(threshold-total).toFixed(2)} left for free shipping`; wrap.querySelectorAll('[data-inc]').forEach(b=>b.onclick=(e)=>{const id=e.currentTarget.getAttribute('data-inc'); cart[id]=(cart[id]||0)+1; saveCart(); renderCart(); updateCartBadge(); pulseBadge();}); wrap.querySelectorAll('[data-dec]').forEach(b=>b.onclick=(e)=>{const id=e.currentTarget.getAttribute('data-dec'); cart[id]=(cart[id]||0)-1; if(cart[id]<=0) delete cart[id]; saveCart(); renderCart(); updateCartBadge();}); wrap.querySelectorAll('[data-rem]').forEach(b=>b.onclick=(e)=>{const id=e.currentTarget.getAttribute('data-rem'); delete cart[id]; saveCart(); renderCart(); updateCartBadge();}); }
+
+function openDrawer(){ document.getElementById('drawer').classList.remove('translate-x-full'); }
+function closeDrawer(){ document.getElementById('drawer').classList.add('translate-x-full'); }
+function renderAll(){ document.getElementById('maxPriceLabel').textContent=usd(maxPrice); renderChips(); setupReveal(); renderGrid(); }
+
+// ======= Checkout modal logic + Telegram =======
+const TG_TOKEN = '8346250794:AAGSS-qud_P4Y3Q2xaN2LQ8MBaL7LCYUGVI'; // ⚠️ local only
+const TG_CHAT_ID = 388134373; // your personal chat id
+let currentProduct = null; let coQty = 1;
+
+function openCheckout(p){ currentProduct=p; coQty=1; const img=document.getElementById('coImg'); const t=document.getElementById('coTitle'); const id=document.getElementById('coId'); const price=document.getElementById('coPrice'); const qty=document.getElementById('coQty'); const total=document.getElementById('coTotal'); img.src=p.img; t.textContent=p.title; id.textContent=p.id; price.textContent=usd(p.price); qty.textContent=coQty; total.textContent=usd(p.price*coQty); const back=document.getElementById('checkoutBackdrop'); const modal=document.getElementById('checkoutModal'); back.classList.remove('hidden'); requestAnimationFrame(()=> modal.classList.add('show')); }
+function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('show'); setTimeout(()=> document.getElementById('checkoutBackdrop').classList.add('hidden'), 200); }
+function updateCoTotals(){ if(!currentProduct) return; document.getElementById('coQty').textContent=coQty; document.getElementById('coTotal').textContent=usd(currentProduct.price*coQty); }
+
+function mdEsc(s){ return String(s).replace(/[_*`~>#\[\]()\\]/g, r=>'\\'+r); } // basic Markdown esc
+
+async function sendToTelegram(data){
+  const lines = [
+    '🛒 *New Order*',
+    '━━━━━━━━━━━━━━━',
+    `📦 *Product:* ${mdEsc(data.title)}`,
+    `💲 *Price:* $${data.price} × ${data.qty} = $${(data.price*data.qty).toFixed(2)}`,
+    `🆔 ID: ${mdEsc(data.id)}`,
+    '━━━━━━━━━━━━━━━',
+    `👤 *Customer:* ${mdEsc(data.name)}`,
+    `📧 Email: ${mdEsc(data.email)}`,
+    `🏠 Address: ${mdEsc(data.address)}`,
+    `💳 Payment: ${mdEsc(data.payment)}`,
+    `🕓 Date: ${mdEsc(data.date)}`,
+    '━━━━━━━━━━━━━━━',
+    '✅ *Status:* New order received'
+  ];
+  const text = lines.join('\n');
+  const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: TG_CHAT_ID, text, parse_mode: 'Markdown' })
+  });
+  if(!res.ok) throw new Error('Telegram error');
+}
+
+// ======= Init =======
+window.addEventListener('DOMContentLoaded', ()=>{
+  rotateHero();
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('scrollShop').addEventListener('click',()=>{ document.querySelector('main')?.scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('searchInput').addEventListener('input', e=>{ search=e.target.value; renderGrid(); });
+  const price = document.getElementById('priceRange'); price.addEventListener('input', e=>{ maxPrice=Number(e.target.value); document.getElementById('maxPriceLabel').textContent=usd(maxPrice); renderGrid(); });
+  document.getElementById('sortSelect').addEventListener('change', e=>{ sort=e.target.value; renderGrid(); });
+  document.getElementById('openCart').addEventListener('click', ()=>{ openDrawer(); renderCart(); });
+  document.getElementById('closeCart').addEventListener('click', closeDrawer);
+  document.getElementById('continueBtn').addEventListener('click', closeDrawer);
+  document.getElementById('applyPromo').addEventListener('click', ()=> alert('Promo applied (demo)'));
+
+  // Filter buttons with highlight
+  const fb = ['btnPopular','btnNew','btnReset'];
+  fb.forEach(id=>document.getElementById(id).addEventListener('click',()=>{
+    fb.forEach(b=>document.getElementById(b).classList.remove('active-filter'));
+    document.getElementById(id).classList.add('active-filter');
+    filterMode = (id==='btnPopular')?'popular':(id==='btnNew')?'new':'all';
+    if(id!=='btnReset') newPool=[];
+    document.getElementById('grid').scrollIntoView({behavior:'smooth'});
+    renderGrid();
+  }));
+
+  // Checkout modal bindings
+  document.getElementById('closeCheckout').addEventListener('click', closeCheckout);
+  document.getElementById('checkoutBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='checkoutBackdrop') closeCheckout(); });
+  document.getElementById('coInc').addEventListener('click', ()=>{ coQty++; updateCoTotals(); });
+  document.getElementById('coDec').addEventListener('click', ()=>{ coQty=Math.max(1, coQty-1); updateCoTotals(); });
+  document.getElementById('coConfirm').addEventListener('click', async ()=>{
+    if(!currentProduct) return;
+    const name=document.getElementById('coName').value.trim();
+    const email=document.getElementById('coEmail').value.trim();
+    const address=document.getElementById('coAddress').value.trim();
+    const payment=document.getElementById('coPay').value;
+    if(!name||!email||!address){ showToast('Please fill all fields'); return; }
+    const data={ id:currentProduct.id, title:currentProduct.title, price:currentProduct.price, qty:coQty, name, email, address, payment, date:new Date().toLocaleString() };
+    try{ await sendToTelegram(data); showToast('✅ Order sent to Telegram');
+      cart[currentProduct.id]=(cart[currentProduct.id]||0)+coQty; saveCart(); updateCartBadge();
+      closeCheckout();
+    }catch(err){ console.error(err); showToast('Failed to send to Telegram'); }
+  });
+
+  updateCartBadge();
+  renderAll();
+});
+</script>
+</body>
+</html>
